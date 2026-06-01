@@ -34,3 +34,4 @@ streamlit-extras>=0.4.0
 # ── Document Reporting Systems ──────────────────────────────────────────────
 reportlab>=4.2.0
 fpdf2>=2.7.9
+openai-whisper
