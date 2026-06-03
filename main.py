@@ -4,17 +4,21 @@ from core.transcriber import transcribe_all
 from core.summarisation import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
 from core.rag_engine import build_rag_chain, ask_question
+import os
 
 load_dotenv()
 
-
 def run_pipeline(source: str, language: str = "english") -> dict:
-    print("starting AI Video Assistant")
+    print("Starting AI Video Assistant")
+
+    # FIX: Ensure required directories exist before pipeline starts
+    os.makedirs("downloads", exist_ok=True)
+    os.makedirs("vector_db", exist_ok=True)
 
     chunks = process_input(source)
 
     transcript = transcribe_all(chunks, language)
-    print(f"raw transcription (first 300 characters ) {transcript[:300]}")
+    print(f"Raw transcription (first 300 characters): {transcript[:300]}")
 
     title = generate_title(transcript)
 
@@ -23,6 +27,7 @@ def run_pipeline(source: str, language: str = "english") -> dict:
     action_item = extract_action_items(transcript)
 
     decisions = extract_key_decisions(transcript)
+
     questions = extract_questions(transcript)
 
     rag_chain = build_rag_chain(transcript)

@@ -21,15 +21,12 @@ LOAD WHISPER MODEL TO
 YOUR PC LOCALLY
 '''
 #-------------------->
-_model = None
+import streamlit as st
 
+@st.cache_resource
 def load_model():
-    global _model
-    if _model is None:
-        print('Loading whisper model: ')
-        _model = whisper.load_model('small')
-        print('Whisper model loaded: ')
-    return _model
+    print('Loading whisper model...')
+    return whisper.load_model('small')
 
 #-------------------->
 '''
@@ -39,16 +36,14 @@ TEXT FORM
 '''
 #-------------------->
 def transcribe_chunk_whisper(chunk_path: str) -> str:
-
     model = load_model()
-
     result = model.transcribe(chunk_path, task="transcribe")
     return result["text"]
 
 #-------------------->
 '''
 WRITE A FUNCTION TO 
-TRANSCRIBE A  CHUNK
+TRANSCRIBE A CHUNK
 USING SARVAM
 '''
 #-------------------->
@@ -73,7 +68,6 @@ def _send_to_sarvam(piece_path: str) -> str:
         response.raise_for_status()
 
     return response.json().get("transcript", "")
-
 
 #-------------------->
 '''
@@ -110,7 +104,6 @@ def transcribe_chunk_sarvam(chunk_path: str) -> str:
 
     return full_text.strip()
 
-
 #-------------------->
 '''
 WRITE A FUNCTION TO CALL 
@@ -126,7 +119,6 @@ def transcribe_chunk(chunk_path: str, language: str = "english") -> str:
         return transcribe_chunk_sarvam(chunk_path)
     return transcribe_chunk_whisper(chunk_path)
 
-
 #-------------------->
 '''
 WRITE A FINAL FUNCTION
@@ -135,26 +127,15 @@ CHUNKS ONE BY ONE
 '''
 #-------------------->
 def transcribe_all(chunks: list, language: str = "english") -> str:
-
     full_transcript = ""
 
     engine = "Sarvam AI" if language.lower() == "hinglish" else "Whisper"
     print(f"Using {engine} for transcription.")
 
     for i, chunk in enumerate(chunks):
-
         print(f"Transcribing chunk {i + 1}/{len(chunks)}...")
-
         text = transcribe_chunk(chunk, language=language)
-
         full_transcript += text + " "
 
     print("Transcription complete.")
-
     return full_transcript.strip()
-
-
-
-
-
-
